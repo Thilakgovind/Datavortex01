@@ -7,7 +7,7 @@
 
 > **Competition:** DATA VORTEX (Aaruush '26) — Round 1: Data Intake Restoration  
 > **Team:** Data Vortex Forensic Analytics Team  
-> **Repository:** [Thilakgovind/datavortex](https://github.com/Thilakgovind/datavortex)
+> **Repository:** [Thilakgovind/Datavortex01](https://github.com/Thilakgovind/Datavortex01)
 
 ---
 
@@ -67,8 +67,8 @@ This repository contains the complete, reproducible forensic restoration pipelin
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Thilakgovind/datavortex.git
-   cd datavortex
+   git clone https://github.com/Thilakgovind/Datavortex01.git
+   cd Datavortex01
    ```
 
 2. **Install dependencies:**

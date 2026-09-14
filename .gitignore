@@ -1,0 +1,6 @@
+# Ignore data and report files for Option 1 (Minimal Repository)
+*.csv
+*.json
+*.pdf
+Round_1_Data_Intake_Restoration_EDA_Report.md
+figures/
