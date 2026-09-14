@@ -1,6 +1,7 @@
 # Data Vortex (Aaruush '26) - Round 1: Data Intake Restoration
 
-- **Team:** Thilak Govind & Team
+- **Team:** CODE COLA
+- **Team Members:** THILAK GOVIND S S, VAISHNAVI S
 - **Repository:** [https://github.com/Thilakgovind/Datavortex01](https://github.com/Thilakgovind/Datavortex01)
 
 ---
