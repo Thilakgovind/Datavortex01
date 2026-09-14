@@ -1,6 +1,18 @@
-# Ignore data and report files for Option 1 (Minimal Repository)
-*.csv
-*.json
-*.pdf
-Round_1_Data_Intake_Restoration_EDA_Report.md
-figures/
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual environments & IDE
+venv/
+env/
+.env/
+.vscode/
+.idea/
+
+# OS metadata
+.DS_Store
+Thumbs.db

@@ -1,80 +1,117 @@
-# 🌀 DATA VORTEX Round 1 (Aaruush '26)
-## Social Engine Telemetry Restoration & Exploratory Data Analysis (EDA)
+# Data Vortex (Aaruush '26) - Round 1
+## Data Intake Restoration & Exploratory Data Analysis
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-Restored%20%26%20Verified-success.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
-
-> **Competition:** DATA VORTEX (Aaruush '26) — Round 1: Data Intake Restoration  
-> **Team:** Data Vortex Forensic Analytics Team  
-> **Repository:** [Thilakgovind/Datavortex01](https://github.com/Thilakgovind/Datavortex01)
+- **Event:** Data Vortex (Aaruush '26) - Round 1: Data Intake Restoration
+- **Team:** Thilak Govind & Team
+- **Repository:** [https://github.com/Thilakgovind/Datavortex01](https://github.com/Thilakgovind/Datavortex01)
 
 ---
 
-## 📌 1. Project Overview
+## 1. Overview
 
-During upstream telemetry extraction from the distributed **Social Engine** platform, a catastrophic ingestion failure corrupted interaction events. The raw telemetry corpus contained duplicated records, impossible negative metrics, unstandardized timestamps across three distinct conventions, and character encoding debris (Mojibake and raw HTML injections).
+In Round 1 of Data Vortex, we received a raw social media interaction dataset (`Social_Engine_Posts_Corrupted.csv`) containing 12,360 rows, alongside user demographic data (`users.csv`) containing 1,500 profiles. The raw dataset contained typical upstream logging anomalies: duplicated submissions, negative interaction numbers, unstandardized timestamp conventions, missing values, and corrupted character encodings.
 
-This repository contains the complete, reproducible forensic restoration pipeline that transforms raw, defective telemetry into an auditable, analysis-ready dataset of **12,000 unique records × 14 columns**, accompanied by deep demographic Exploratory Data Analysis.
-
----
-
-## 🛠️ 2. Summary of Defects & Restoration Pipeline
-
-| Stage / Vector | Raw Defect | Verified Defect Count | Restoration Treatment | Final Verified State |
-|---|---|---|---|---|
-| **1. Deduplication** | Ingestion pipeline logged duplicate packets | **360 duplicate rows** (12,360 total) | Deduplication on primary key `post_id` | Exactly **12,000 unique records** |
-| **2. Missing Platform** | Unrecorded source networks (NaN & `'NULL'`) | **1,784 records** | Standardized to `'Unknown'` to preserve volume without false attribution | 1,784 `'Unknown'`; 0 missing |
-| **3. Negative Likes** | Telemetry sign-inversion faults (e.g., `-4,812`) | **525 records** | Enforced domain invariants via `abs()` | Minimum likes: **0**; 0 negative values |
-| **4. Missing Likes** | Telemetry drops / unrecorded interactions | **1,858 records** | Coerced to `0` with explicit zero-interaction telemetry rationale | 1,815 zero-like entries |
-| **5. Timestamp Normalization** | Mixed Unix epochs, ISO 8601, and DD-MM-YYYY | **12,000 records** | Cascading parser standardizing to UTC ISO string format | **100% (12,000/12,000)** UTC ISO datetimes |
-| **6. Mojibake Cleaning** | Encoding corruption at string boundaries | **316 records** | Regex stripping targeted at string ends (`[\u00e9\u00a9\ufffd]+$`) | Terminal debris removed, internal text intact |
-| **7. HTML Artifacts** | Trailing ampersands (`&amp;`, `&`) & tags | **341 &amp; / 663 tags** | Regex stripping + `html.unescape()` | Clean, human-readable text |
-| **8. Demographic Join** | Link posts to user master table | **1,500 distinct users** | Left join on `user_id` against `users.csv` | **100% match (0 orphaned posts)** |
-| **9. Feature Engineering** | Derive engagement metrics | — | `total_engagement = likes + shares + comments`<br>`engagement_rate = total_engagement / follower_count` | Computed for all 12,000 records |
+Our objective was to restore the intake pipeline by:
+1. Identifying and correcting all data anomalies systematically without dropping valid interaction records.
+2. Standardizing timestamps into UTC ISO 8601 format and sanitizing text strings.
+3. Joining posts with user demographic attributes.
+4. Engineering engagement metrics and conducting exploratory analysis to evaluate user behavior.
 
 ---
 
-## 📊 3. Key Analytical Insights (EDA)
+## 2. Deliverables Checklist
 
-1. **Strict Platform Parity:** Content volume is distributed virtually uniformly across networks: Facebook (2,074), YouTube (2,073), Twitter (2,049), Reddit (2,031), Instagram (1,989), and restored Unknown posts (1,784). Mean interactions per post are uniformly balanced between 5,468 and 5,532.
-2. **Language Performance Disparity:** German (`de`) and Spanish (`es`) creator accounts produce the highest follower engagement rates (**61.6%** and **60.5%** respectively), outperforming English creators (**25.5%**) by more than **2.4×**.
-3. **The "Scale Paradox":** Follower count has virtually no correlation with raw interaction volume ($r = -0.0109$), but has a statistically significant negative correlation with follower engagement rate (**$r = -0.3139$**). Accounts with large followings suffer acute engagement dilution, demonstrating that distributed micro-influencer activations deliver superior conversion efficiency.
+| Required Component | Repository File | Status |
+|---|---|---|
+| **Cleaned Dataset (CSV)** | `cleaned_social_posts.csv` | Completed (12,000 rows, 14 columns) |
+| **Cleaned Dataset (JSON)** | `cleaned_social_posts.json` | Completed (12,000 records) |
+| **EDA Report (Markdown)** | `EDA_Report.md` | Completed (with embedded figures) |
+| **EDA Report (PDF)** | `EDA_Report.pdf` | Completed |
+| **Code Notebook** | `Data_Vortex_Phase1_Pipeline.ipynb` | Completed (runnable end-to-end) |
+| **Raw Datasets** | `Social_Engine_Posts_Corrupted.csv`, `users.csv` | Included for complete reproducibility |
 
 ---
 
-## 📂 4. Repository Structure
+## 3. Data Cleaning and Restoration Pipeline
+
+The table below outlines the defects identified in `Social_Engine_Posts_Corrupted.csv` and the restoration logic applied:
+
+| Issue Found | Raw Count | Resolution Strategy | Resulting Clean State |
+|---|---|---|---|
+| **Duplicate Records** | 360 duplicate rows | Deduplicated on primary key `post_id` | Exactly 12,000 unique records |
+| **Missing Platforms** | 1,784 missing / null values | Labeled as `'Unknown'` category | Kept all posts; prevents platform skew |
+| **Negative Likes** | 525 negative values (< 0) | Converted with `abs()` | Min likes = 0; real magnitude preserved |
+| **Missing Likes** | 1,858 null entries | Imputed with `0` | Treated as unrecorded interactions |
+| **Mixed Timestamps** | 12,000 mixed formats | Parsed Unix Epoch, ISO 8601, and DD-MM to UTC | 100% unified `YYYY-MM-DD HH:MM:SS+00:00` |
+| **Broken Text (Mojibake)** | 316 trailing byte artifacts | Stripped terminal garbage bytes using regex (`[^\x00-\x7F]+$`) | Clean text; legitimate accents preserved |
+| **HTML Tags & Ampersands** | 341 `&amp;` / 663 HTML tags | Stripped tags and unescaped HTML entities | Clean plain text |
+| **User Profile Join** | 1,500 user profiles | Left join on `user_id` against `users.csv` | 100% match rate across all 12,000 posts |
+| **Feature Engineering** | Engagement metrics | Derived total interactions and engagement rate | `total_engagement = likes + shares + comments`<br>`engagement_rate = total_engagement / follower_count` |
+
+---
+
+## 4. Key Engineering Decisions
+
+- **Missing platforms labeled as 'Unknown':** Dropping records with missing platforms would delete 1,784 posts (nearly 15% of the dataset). Imputing a platform would introduce false attribution. Using `'Unknown'` retains valid interaction counts while keeping platform comparisons unbiased.
+- **Negative likes restored with absolute value:** Values like `-4,812` indicate a sign-bit flip during logging. Using `abs()` restores the genuine interaction count. Missing likes were filled with `0` to reflect no recorded likes without fabricating values.
+- **Terminal regex text cleaning:** Encoding artifacts were located at the end of post strings. Anchoring regex replacement strictly to the end of the string (`$`) cleanly stripped corrupted byte sequences without removing valid accents or international characters within the text.
+
+---
+
+## 5. Summary of EDA Findings
+
+1. **Platform Distribution:**  
+   Post volume is balanced across major platforms: Facebook (2,074), YouTube (2,073), Twitter (2,049), Reddit (2,031), Instagram (1,989), alongside 1,784 Unknown posts. Average interactions per post are uniform across platforms (~5,468 to 5,532).
+2. **Language Performance:**  
+   German (61.6%) and Spanish (60.5%) creators generate over 2.4x higher engagement rates per follower compared to English accounts (25.5%), highlighting higher audience loyalty among regional creator communities.
+3. **The Scale Paradox:**  
+   - Follower count vs. raw interactions: $r = -0.0109$ (no correlation).
+   - Follower count vs. engagement rate: $r = -0.3139$ (moderate inverse correlation).  
+   As accounts grow, engagement rate drops due to audience dilution. Smaller accounts engage their audience more effectively per follower.
+
+For in-depth analysis and charts, see [EDA_Report.md](EDA_Report.md).
+
+---
+
+## 6. Repository Structure
 
 ```
-├── Data_Vortex_Phase1_Pipeline.ipynb        # Complete, executed notebook with cleaning & EDA
-├── cleaned_social_posts.csv                 # Restored dataset (12,000 rows × 14 columns)
-├── cleaned_social_posts.json                # Restored dataset in JSON format
-├── Round_1_Data_Intake_Restoration_EDA_Report.pdf  # Executive printable report with charts
-├── Round_1_Data_Intake_Restoration_EDA_Report.md   # Complete report in Markdown
-├── figures/                                 # High-resolution generated EDA charts
-│   ├── fig1_platform_distribution.png
-│   ├── fig2_avg_engagement_platform.png
-│   ├── fig3_engagement_by_language.png
-│   └── fig4_scale_paradox.png
-├── Social_Engine_Posts_Corrupted.csv        # Original raw corrupted telemetry
-├── users.csv                                # Master user demographic table (1,500 users)
-└── README.md                                # Repository documentation
+├── .gitignore                          # Git ignore rules for temporary files
+├── README.md                           # Main repository documentation
+├── EDA_Report.md                       # Comprehensive EDA report with inline charts
+├── EDA_Report.pdf                      # Printable PDF report
+├── Data_Vortex_Phase1_Pipeline.ipynb   # Complete cleaning pipeline, comments & EDA notebook
+├── Social_Engine_Posts_Corrupted.csv   # Raw input dataset (12,360 rows)
+├── users.csv                           # User demographic metadata (1,500 profiles)
+├── cleaned_social_posts.csv            # Cleaned final dataset (12,000 rows x 14 columns)
+├── cleaned_social_posts.json           # Cleaned final dataset in JSON format
+└── figures/                            # Exported high-resolution visualization charts
+    ├── fig1_platform_distribution.png
+    ├── fig2_avg_engagement_platform.png
+    ├── fig3_engagement_by_language.png
+    └── fig4_scale_paradox.png
 ```
 
 ---
 
-## 🚀 5. How to Reproduce
+## 7. How to Run and Reproduce
 
-1. **Clone the repository:**
+### Prerequisites
+Python 3.9+ with the following packages:
+```bash
+pip install pandas numpy matplotlib
+```
+
+### Execution Steps
+1. Clone the repository:
    ```bash
    git clone https://github.com/Thilakgovind/Datavortex01.git
    cd Datavortex01
    ```
 
-2. **Install dependencies:**
-   ```bash
-   pip install pandas numpy matplotlib
-   ```
-
-3. **Run the restoration pipeline & EDA:**
-   Open and run all cells in `Data_Vortex_Phase1_Pipeline.ipynb`, or launch with Jupyter / VS Code / Antigravity IDE.
+2. Run the notebook:
+   Open `Data_Vortex_Phase1_Pipeline.ipynb` in VS Code or JupyterLab and execute all cells. The notebook will:
+   - Load raw datasets
+   - Apply cleaning and validation steps
+   - Export `cleaned_social_posts.csv` and `cleaned_social_posts.json`
+   - Generate and save all EDA figures into `figures/`
