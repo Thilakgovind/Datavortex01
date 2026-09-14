@@ -1,12 +1,12 @@
-# Data files and reports (submitted via Google Form)
-*.csv
-*.json
-*.pdf
-EDA_Report.md
-Round_1_Data_Intake_Restoration_EDA_Report.md
+# Raw datasets and auxiliary files
+Social_Engine_Posts_Corrupted.csv
+users.csv
+cleaned_social_posts.json
 figures/
+Round_1_*
+EDA_Report.md
 
-# Python & Jupyter cache
+# Cache and environment
 __pycache__/
 .ipynb_checkpoints/
 *.py[cod]
