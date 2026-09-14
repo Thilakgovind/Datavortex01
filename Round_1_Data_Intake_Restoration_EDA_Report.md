@@ -1,7 +1,7 @@
 # DATA VORTEX Round 1 (Aaruush '26) — Data Intake Restoration & EDA Report
 
 **Project Title:** Social Engine Telemetry Restoration & Audience Behavioral Analysis  
-**Repository:** [vs03-oss/Data-Vortex-Round-1](https://github.com/vs03-oss/Data-Vortex-Round-1)  
+**Repository:** [Thilakgovind/datavortex](https://github.com/Thilakgovind/datavortex)  
 **Deliverables:** Cleaned Dataset (`.csv`, `.json`), Runnable Jupyter Notebook (`Data_Vortex_Phase1_Pipeline.ipynb`), Final Report  
 **Date:** September 14, 2026  
 
